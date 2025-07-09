@@ -263,8 +263,15 @@ public class BoardExample {
 		String boardTitle = scanner.nextLine();
 		System.out.print("내용: ");
 		String boardContent = scanner.nextLine();
-		System.out.print("작성자: ");
-		String boardWriter = scanner.nextLine();
+		
+		// 로그인 했을 경우 작성자 생략
+		String boardWriter = "";
+		if (loginId == null) { // 로그인 안 했을 경우
+			System.out.print("작성자: ");
+			boardWriter = scanner.nextLine();
+		} else {				// 로그인 했을 경우
+			boardWriter = loginId;
+		}
 		
 		// 보조메뉴 출력
 		if(printSubMenu().equals("1")) {	// 1. OK이면 실제 DB의 Boards테이블에 입력한 값을 등록
@@ -314,22 +321,27 @@ public class BoardExample {
 			// select문 실행
 			ResultSet rs = pstmt.executeQuery();
 			if(rs.next()) { // cursor 포인트가 1행 이동
+				String bwriter = rs.getString("bwriter");
+				
 				System.out.println("##############");
 				System.out.println("번호: " + rs.getInt("bno"));
 				System.out.println("제목: " + rs.getString("btitle"));
 				System.out.println("내용: " + rs.getString("bcontent"));
-				System.out.println("작성자: " + rs.getString("bwriter"));
+				System.out.println("작성자: " + bwriter);
 				System.out.println("날짜: " + rs.getDate("bdate"));
 				System.out.println("----------------------------------");
 				
-				System.out.println("보조메뉴: 1.Update | 2.Delete | 3.List");
-				System.out.print("메뉴선택: ");
-				String menuNo = scanner.nextLine();
-				
-				if(menuNo.equals("1")) {
-					update(bno);
-				} else if(menuNo.equals("2")) {
-					delete(bno);
+				// 로그인을 하였고 로그인한 아이디나 작성자가 동일할 경우(10-2)
+				if (loginId != null && bwriter.equals(loginId)) {  
+					System.out.println("보조메뉴: 1.Update | 2.Delete | 3.List");
+					System.out.print("메뉴선택: ");
+					String menuNo = scanner.nextLine();
+					
+					if(menuNo.equals("1")) {
+						update(bno);
+					} else if(menuNo.equals("2")) {
+						delete(bno);
+					}
 				}
 			}
 		} catch(Exception e) {
@@ -362,8 +374,14 @@ public class BoardExample {
 		String bTitle = scanner.nextLine();
 		System.out.print("내용: "); 	
 		String bContent = scanner.nextLine();
-		System.out.print("작성자: "); 	
-		String bWriter = scanner.nextLine();
+		
+		String bWriter = "";
+		if (loginId == null) {
+			System.out.print("작성자: "); 	
+			bWriter = scanner.nextLine();
+		} else {
+			bWriter = loginId;
+		}
 		
 		// 보조메뉴 출력
 		if(printSubMenu().equals("1")) {
